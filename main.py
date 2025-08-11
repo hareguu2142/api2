@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from typing import List
 from pydantic import BaseModel, Field
 from fastapi import Query, HTTPException
@@ -76,9 +77,50 @@ def get_prime_factors(n: int) -> List[int]:
        factors.append(n)
     return factors
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def root():
-    return {"message": "hello api2"}
+    return """
+    <html>
+        <head>
+            <title>API2 메인</title>
+        </head>
+        <body>
+            <h1>API2 사용 예시</h1>
+            <ul>
+                <li>
+                    <strong>Ping 테스트</strong><br>
+                    <code>GET /ping</code><br>
+                    예: <a href="/ping" target="_blank">/ping</a>
+                </li>
+                <li>
+                    <strong>헬스 체크</strong><br>
+                    <code>GET /healthz</code><br>
+                    예: <a href="/healthz" target="_blank">/healthz</a>
+                </li>
+                <li>
+                    <strong>한글 자모 분해 (Query)</strong><br>
+                    <code>GET /jamo/decompose?text=한글&compat=true</code><br>
+                    예: <a href="/jamo/decompose?text=한글&compat=true" target="_blank">/jamo/decompose?text=한글&compat=true</a>
+                </li>
+                <li>
+                    <strong>한글 자모 분해 (POST, 단일)</strong><br>
+                    <code>POST /jamo/decompose</code><br>
+                    Body(JSON): <pre>{ "text": "한글", "compat": true }</pre>
+                </li>
+                <li>
+                    <strong>한글 자모 분해 (POST, 배치)</strong><br>
+                    <code>POST /jamo/decompose/batch</code><br>
+                    Body(JSON): <pre>{ "texts": ["한글", "테스트"], "compat": false }</pre>
+                </li>
+                <li>
+                    <strong>소인수분해</strong><br>
+                    <code>GET /factorize/360</code><br>
+                    예: <a href="/factorize/360" target="_blank">/factorize/360</a>
+                </li>
+            </ul>
+        </body>
+    </html>
+    """
 
 @app.get("/ping")
 def ping():
